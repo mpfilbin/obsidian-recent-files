@@ -80,16 +80,40 @@ just install
 
 ## Creating a release
 
+### Automatic (recommended)
+
+Releases are cut automatically when a version bump lands on `master`:
+
+1. On your branch, bump the version:
+   ```bash
+   just version-bump patch   # or minor / major
+   ```
+2. Commit the version bump (`manifest.json`, `package.json`, `versions.json`) and open a PR as
+   usual.
+3. Once the PR is merged, the **Release on merge** GitHub Action checks whether the version in
+   `manifest.json` already has a release. If not, it runs the full check (lint + test + build),
+   generates checksums, and publishes a BRAT-compatible GitHub release — no further action
+   needed.
+
+A merge that doesn't change the version is a no-op: the workflow sees a release for that version
+already exists and skips.
+
+### Manual
+
+You can also cut a release directly from your machine without merging a PR — useful for
+re-releasing or testing the release pipeline locally:
+
 ```bash
 # Bump version (patch/minor/major)
 just version-bump patch
 
-# Run full release pipeline
+# Run full release pipeline (lint + test + build + checksums)
 just release-build
 
-# Tag and push (triggers GitHub Action)
+# Tag and push (triggers the release GitHub Action)
 just tag
 ```
 
-The GitHub Action will automatically create a BRAT-compatible release with build artifacts
-and SHA-256 checksums.
+Either path runs the same release workflow and produces the same artifacts: `main.js`,
+`manifest.json`, `styles.css`, and `SHA256SUMS.txt` attached to a GitHub release named after the
+version.

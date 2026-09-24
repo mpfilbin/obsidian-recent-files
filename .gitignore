@@ -1,0 +1,8 @@
+node_modules/
+main.js
+*.js.map
+.env
+.DS_Store
+SHA256SUMS.txt
+coverage/
+data.json

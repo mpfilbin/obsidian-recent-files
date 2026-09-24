@@ -1,6 +1,6 @@
 {
 	"name": "recent-files",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Quickly reopen files you recently modified or opened, from a command or ribbon icon.",
 	"main": "main.js",
 	"scripts": {

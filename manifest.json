@@ -1,7 +1,7 @@
 {
 	"id": "recent-files",
 	"name": "Recent Files",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"minAppVersion": "1.7.2",
 	"description": "Quickly reopen files you recently modified or opened, from a command or ribbon icon.",
 	"author": "Michael Filbin",

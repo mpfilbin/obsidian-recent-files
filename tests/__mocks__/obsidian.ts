@@ -37,16 +37,47 @@ export class Plugin extends Component {
 	addSettingTab(_tab: unknown): void {}
 }
 
-export class App {
-	workspace = {
-		on: () => ({}),
-		getLeaf: () => ({ openFile: async (_file: unknown) => {} }),
-	};
+/** A tiny event emitter standing in for Obsidian's Events base class. */
+class FakeEvents {
+	private listeners = new Map<string, Array<(...args: never[]) => void>>();
 
-	vault = {
-		on: () => ({}),
-		getAbstractFileByPath: (_path: string) => null,
-	};
+	on(name: string, callback: (...args: never[]) => void): { name: string; callback: unknown } {
+		const existing = this.listeners.get(name) ?? [];
+		existing.push(callback);
+		this.listeners.set(name, existing);
+		return { name, callback };
+	}
+
+	/** Test-only helper: simulates Obsidian firing a workspace/vault event. */
+	trigger(name: string, ...args: never[]): void {
+		for (const callback of this.listeners.get(name) ?? []) {
+			callback(...args);
+		}
+	}
+}
+
+export class Workspace extends FakeEvents {
+	getLeaf(_pinned?: boolean): { openFile: (file: unknown) => Promise<void> } {
+		return { openFile: async (_file: unknown) => {} };
+	}
+}
+
+export class Vault extends FakeEvents {
+	private filesByPath = new Map<string, unknown>();
+
+	getAbstractFileByPath(path: string): unknown {
+		return this.filesByPath.get(path) ?? null;
+	}
+
+	/** Test-only helper: registers a file/folder so getAbstractFileByPath can resolve it. */
+	setAbstractFileForTesting(path: string, file: unknown): void {
+		this.filesByPath.set(path, file);
+	}
+}
+
+export class App {
+	workspace = new Workspace();
+	vault = new Vault();
 }
 
 class TextComponentStub {

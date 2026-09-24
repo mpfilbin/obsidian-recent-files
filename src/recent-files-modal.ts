@@ -19,7 +19,7 @@ export class RecentFilesModal extends FuzzySuggestModal<TFile> {
 		return file.path;
 	}
 
-	onChooseItem(file: TFile): void {
+	onChooseItem(file: TFile, _evt: MouseEvent | KeyboardEvent): void {
 		this.onChoose(file);
 	}
 }

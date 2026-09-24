@@ -16,6 +16,24 @@ describe('RecentFilesTracker', () => {
 				expect(tracker.getEntries()).toEqual([{ path: 'a.md', timestamp: 1 }]);
 			});
 		});
+
+		describe('when constructed with duplicate paths in the initial entries', () => {
+			it('keeps only one entry per path', () => {
+				const tracker = new RecentFilesTracker(50, [
+					{ path: 'a.md', timestamp: 1 },
+					{ path: 'a.md', timestamp: 5 },
+				]);
+				expect(tracker.getEntries()).toHaveLength(1);
+			});
+
+			it('keeps the most recent timestamp for that path', () => {
+				const tracker = new RecentFilesTracker(50, [
+					{ path: 'a.md', timestamp: 1 },
+					{ path: 'a.md', timestamp: 5 },
+				]);
+				expect(tracker.getEntries()[0].timestamp).toBe(5);
+			});
+		});
 	});
 
 	describe('touch', () => {
@@ -104,6 +122,41 @@ describe('RecentFilesTracker', () => {
 		});
 	});
 
+	describe('removeUnderFolder', () => {
+		describe('when entries exist under the folder', () => {
+			it('removes entries nested directly under the folder', () => {
+				const tracker = new RecentFilesTracker(50, [
+					{ path: 'notes/a.md', timestamp: 1 },
+					{ path: 'other.md', timestamp: 2 },
+				]);
+				tracker.removeUnderFolder('notes');
+				expect(tracker.getEntries().map((e) => e.path)).toEqual(['other.md']);
+			});
+
+			it('removes entries nested several levels under the folder', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes/sub/a.md', timestamp: 1 }]);
+				tracker.removeUnderFolder('notes');
+				expect(tracker.getEntries()).toEqual([]);
+			});
+		});
+
+		describe('when an entry path only shares a prefix with the folder name', () => {
+			it('does not remove that entry', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes-2/a.md', timestamp: 1 }]);
+				tracker.removeUnderFolder('notes');
+				expect(tracker.getEntries()).toHaveLength(1);
+			});
+		});
+
+		describe('when no entries exist under the folder', () => {
+			it('leaves the list unchanged', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'other.md', timestamp: 1 }]);
+				tracker.removeUnderFolder('notes');
+				expect(tracker.getEntries()).toEqual([{ path: 'other.md', timestamp: 1 }]);
+			});
+		});
+	});
+
 	describe('rename', () => {
 		describe('when the old path exists', () => {
 			it('updates the entry to the new path', () => {
@@ -124,6 +177,52 @@ describe('RecentFilesTracker', () => {
 				const tracker = new RecentFilesTracker(50, [{ path: 'a.md', timestamp: 1 }]);
 				tracker.rename('missing.md', 'renamed.md');
 				expect(tracker.getEntries()).toEqual([{ path: 'a.md', timestamp: 1 }]);
+			});
+		});
+	});
+
+	describe('renamePrefix', () => {
+		describe('when entries exist under the old folder path', () => {
+			it('rewrites entries nested directly under the folder', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes/a.md', timestamp: 1 }]);
+				tracker.renamePrefix('notes', 'archive');
+				expect(tracker.getEntries()[0].path).toBe('archive/a.md');
+			});
+
+			it('rewrites entries nested several levels under the folder', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes/sub/a.md', timestamp: 1 }]);
+				tracker.renamePrefix('notes', 'archive');
+				expect(tracker.getEntries()[0].path).toBe('archive/sub/a.md');
+			});
+
+			it('preserves the entry timestamp', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes/a.md', timestamp: 42 }]);
+				tracker.renamePrefix('notes', 'archive');
+				expect(tracker.getEntries()[0].timestamp).toBe(42);
+			});
+		});
+
+		describe('when an entry matches the old folder path exactly', () => {
+			it('rewrites it to the new folder path', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes', timestamp: 1 }]);
+				tracker.renamePrefix('notes', 'archive');
+				expect(tracker.getEntries()[0].path).toBe('archive');
+			});
+		});
+
+		describe('when an entry path only shares a prefix with the folder name', () => {
+			it('does not rewrite that entry', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'notes-2/a.md', timestamp: 1 }]);
+				tracker.renamePrefix('notes', 'archive');
+				expect(tracker.getEntries()[0].path).toBe('notes-2/a.md');
+			});
+		});
+
+		describe('when no entries exist under the old folder path', () => {
+			it('leaves the list unchanged', () => {
+				const tracker = new RecentFilesTracker(50, [{ path: 'other.md', timestamp: 1 }]);
+				tracker.renamePrefix('notes', 'archive');
+				expect(tracker.getEntries()).toEqual([{ path: 'other.md', timestamp: 1 }]);
 			});
 		});
 	});

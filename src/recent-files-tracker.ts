@@ -27,10 +27,30 @@ export class RecentFilesTracker {
 		this.entries = this.entries.filter((entry) => entry.path !== path);
 	}
 
+	removeUnderFolder(folderPath: string): void {
+		const prefix = `${folderPath}/`;
+		this.entries = this.entries.filter(
+			(entry) => entry.path !== folderPath && !entry.path.startsWith(prefix),
+		);
+	}
+
 	rename(oldPath: string, newPath: string): void {
 		this.entries = this.entries.map((entry) =>
 			entry.path === oldPath ? { ...entry, path: newPath } : entry,
 		);
+	}
+
+	renamePrefix(oldFolderPath: string, newFolderPath: string): void {
+		const prefix = `${oldFolderPath}/`;
+		this.entries = this.entries.map((entry) => {
+			if (entry.path === oldFolderPath) {
+				return { ...entry, path: newFolderPath };
+			}
+			if (entry.path.startsWith(prefix)) {
+				return { ...entry, path: newFolderPath + entry.path.slice(oldFolderPath.length) };
+			}
+			return entry;
+		});
 	}
 
 	setMaxEntries(maxEntries: number): void {
@@ -43,7 +63,14 @@ export class RecentFilesTracker {
 	}
 
 	private sortedByRecency(entries: RecentFileEntry[]): RecentFileEntry[] {
-		return [...entries].sort((a, b) => b.timestamp - a.timestamp);
+		const latestByPath = new Map<string, RecentFileEntry>();
+		for (const entry of entries) {
+			const existing = latestByPath.get(entry.path);
+			if (!existing || entry.timestamp > existing.timestamp) {
+				latestByPath.set(entry.path, entry);
+			}
+		}
+		return [...latestByPath.values()].sort((a, b) => b.timestamp - a.timestamp);
 	}
 
 	private trimToMax(): void {

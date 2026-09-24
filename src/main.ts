@@ -1,4 +1,4 @@
-import { Plugin, TFile } from 'obsidian';
+import { Plugin, TFile, TFolder } from 'obsidian';
 import { DEFAULT_SETTINGS, RecentFilesSettingTab, type RecentFilesPluginSettings } from './settings';
 import { RecentFilesTracker } from './recent-files-tracker';
 import { RecentFilesModal } from './recent-files-modal';
@@ -41,14 +41,22 @@ export default class RecentFilesPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.vault.on('delete', (file) => {
-				this.tracker.remove(file.path);
+				if (file instanceof TFolder) {
+					this.tracker.removeUnderFolder(file.path);
+				} else {
+					this.tracker.remove(file.path);
+				}
 				void this.saveRecentFiles();
 			}),
 		);
 
 		this.registerEvent(
 			this.app.vault.on('rename', (file, oldPath) => {
-				this.tracker.rename(oldPath, file.path);
+				if (file instanceof TFolder) {
+					this.tracker.renamePrefix(oldPath, file.path);
+				} else {
+					this.tracker.rename(oldPath, file.path);
+				}
 				void this.saveRecentFiles();
 			}),
 		);

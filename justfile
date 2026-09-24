@@ -64,9 +64,10 @@ clean:
 # --- Release targets (used by CI and local release workflow) ---
 
 # Bump version in manifest.json, package.json, and versions.json
+# (npm's own "version" lifecycle script runs version-bump.mjs with
+# npm_package_version set correctly — do not call it again here)
 version-bump level="patch":
     npm version {{level}} --no-git-tag-version
-    node version-bump.mjs
 
 # Generate SHA-256 checksums for release artifacts
 checksum:

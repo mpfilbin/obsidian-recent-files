@@ -57,8 +57,9 @@ Plugins directory.
 ## Development
 
 Prerequisites: [Node.js](https://nodejs.org/) (LTS), [just](https://github.com/casey/just). The
-Node version is pinned in `.tool-versions` — if you use [asdf](https://asdf-vm.com/), run
-`asdf install` to pick it up automatically.
+Node version is set in `.nvmrc` (CI reads it too) — run `nvm use`, or if you use
+[asdf](https://asdf-vm.com/), `asdf install` picks up `.tool-versions`. Node 22 or newer is
+supported (`engines` in `package.json`).
 
 ```bash
 # Install dependencies

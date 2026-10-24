@@ -18,6 +18,9 @@
 	],
 	"author": "Michael Filbin",
 	"license": "MIT",
+	"engines": {
+		"node": ">=22"
+	},
 	"devDependencies": {
 		"@types/node": "^22.0.0",
 		"@typescript-eslint/parser": "^8.0.0",

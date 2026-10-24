@@ -22,7 +22,7 @@
 		"node": ">=22"
 	},
 	"devDependencies": {
-		"@types/node": "^22.0.0",
+		"@types/node": "^26.6.5",
 		"@typescript-eslint/parser": "^8.0.0",
 		"builtin-modules": "^5.4.0",
 		"esbuild": "^0.24.0",

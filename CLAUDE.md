@@ -74,3 +74,6 @@ just version-bump         # patch bump (0.1.0 → 0.1.1)
 just version-bump minor   # minor bump (0.1.0 → 0.2.0)
 just version-bump major   # major bump (0.1.0 → 1.0.0)
 ```
+
+Bump the patch version in any PR that updates dependencies (npm packages, GitHub Actions, or
+the Node version), so the change is released. Dependabot PRs get the bump added before merging.

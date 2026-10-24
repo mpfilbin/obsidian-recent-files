@@ -4,8 +4,8 @@ import { RecentFilesTracker } from './recent-files-tracker';
 import { RecentFilesModal } from './recent-files-modal';
 
 export default class RecentFilesPlugin extends Plugin {
-	settings: RecentFilesPluginSettings;
-	tracker: RecentFilesTracker;
+	settings!: RecentFilesPluginSettings;
+	tracker!: RecentFilesTracker;
 
 	async onload() {
 		await this.loadSettings();

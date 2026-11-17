@@ -1,6 +1,6 @@
 {
 	"name": "recent-files",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "Quickly reopen files you recently modified or opened, from a command or ribbon icon.",
 	"main": "main.js",
 	"scripts": {
@@ -23,7 +23,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.5",
-		"@typescript-eslint/parser": "^8.0.0",
+		"@typescript-eslint/parser": "^8.72.2",
 		"builtin-modules": "^5.4.0",
 		"esbuild": "^0.28.2",
 		"eslint": "^10.13.0",
